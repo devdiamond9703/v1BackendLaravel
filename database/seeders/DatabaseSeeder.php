@@ -14,6 +14,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            AttributeSeeder::class,
+            AttributeValueSeeder::class,
+            ProductCategorySeeder::class,
+            ProductCategoryAttributeSeeder::class,
+            ProductSeeder::class,
+            ProductPropertySeeder::class,
+            ProductVariantSeeder::class,
+            PriceSeeder::class,
+            ImageSeeder::class,
+        ]);
     }
 }

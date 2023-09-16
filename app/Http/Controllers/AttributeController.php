@@ -5,82 +5,61 @@ namespace App\Http\Controllers;
 use App\Models\Attribute;
 use App\Http\Requests\StoreAttributeRequest;
 use App\Http\Requests\UpdateAttributeRequest;
+use App\Http\Resources\AttributeResource;
+use App\Models\AttributeValue;
+use Illuminate\Http\Request;
 
 class AttributeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        return response()->json(Attribute::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        if($request->id) {
+            $model = Attribute::find($request->id);
+            $model->name = $request->name;
+            $model->type = $request->type;
+            if($model->save()) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Updated successfully',
+                    'data' => $model
+                ]);
+            }   
+        }
+        
+        $model = new Attribute();
+        $model->name = $request->name;
+        $model->type = $request->type;
+        if($model->save()) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Saved successfully',
+                'data' => $model
+            ]);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreAttributeRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreAttributeRequest $request)
+    public function valuesByAttr(Request $request)
     {
-        //
+        $object = AttributeValue::where('attribute_id', $request->id)->get();
+        return response()->json($object);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Attribute  $attribute
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Attribute $attribute)
+    public function storeValueByAttr(Request $request)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Attribute  $attribute
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Attribute $attribute)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateAttributeRequest  $request
-     * @param  \App\Models\Attribute  $attribute
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateAttributeRequest $request, Attribute $attribute)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Attribute  $attribute
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Attribute $attribute)
-    {
-        //
+        $model = new AttributeValue();
+        $model->attribute_id = $request->attribute_id;
+        $model->value = $request->value;
+        if($model->save()) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Saved successfully',
+                'data' => $model
+            ]);
+        }
     }
 }
