@@ -5,82 +5,82 @@ namespace App\Http\Controllers;
 use App\Models\ProductCategory;
 use App\Http\Requests\StoreProductCategoryRequest;
 use App\Http\Requests\UpdateProductCategoryRequest;
+use App\Models\ProductCategoryAttribute;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public function index()
     {
-        //
+        $object = DB::table('product_categories AS pc')
+                ->select('pc.id', 'pc.name')
+                ->get();
+        return response()->json($object);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        if($request->id) {
+            $model = ProductCategory::find($request->id);
+        } else {
+            $model = new ProductCategory();
+        }
+        $model->name = $request->name;
+        if($model->save()) {
+            return response()->json([
+                'status' => true,
+                'data' => $model,
+            ]);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreProductCategoryRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreProductCategoryRequest $request)
-    {
-        //
+    public function attrByCategory(Request $request) {
+        $object = DB::table('product_category_attributes AS pca')
+                ->select(
+                    'pca.id AS categoryAttrId',
+                    'a.id AS attrId',
+                    'a.name AS attrName'
+                )
+                ->leftJoin('attributes AS a', 'pca.attribute_id', '=', 'a.id')
+                ->where('pca.product_category_id', $request->id)
+                ->get();
+        // $object = ProductCategoryAttribute::where('product_category_id', $request->id)->get();
+        return response()->json($object);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\ProductCategory  $productCategory
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ProductCategory $productCategory)
-    {
-        //
+    public function attrAndValuesByCategory(Request $request) {
+        $object = DB::table('product_category_attributes AS pca')
+                ->select(
+                    'pca.id AS categoryAttrId',
+                    'a.id AS attrId',
+                    'a.name AS attrName'
+                )
+                ->leftJoin('attributes AS a', 'pca.attribute_id', '=', 'a.id')
+                ->where('pca.product_category_id', $request->id)
+                ->get();
+        return response()->json($object);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\ProductCategory  $productCategory
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ProductCategory $productCategory)
+    public function storeAttrByCategory(Request $request)
     {
-        //
-    }
+        if($request->id) {
+            $model = ProductCategoryAttribute::find($request->id);
+        } else {
+            $model = new ProductCategoryAttribute();
+        }
+        $model->product_category_id = $request->product_category_id;
+        $model->attribute_id = $request->attribute_id;
+        $model->sort = $request->sort;
+        $model->status = $request->status;
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateProductCategoryRequest  $request
-     * @param  \App\Models\ProductCategory  $productCategory
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory)
-    {
-        //
+        if($model->save()) {
+            return response()->json([
+                'status' => true
+            ]);
+        } 
     }
+    
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\ProductCategory  $productCategory
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(ProductCategory $productCategory)
-    {
-        //
-    }
 }

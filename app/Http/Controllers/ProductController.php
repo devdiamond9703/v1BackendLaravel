@@ -5,82 +5,54 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $object = DB::table('products AS p')
+            ->select(
+                'pc.id AS productCatId', 
+                'pc.name AS productCatName',
+                'p.id AS productId',
+                'p.name AS productName',
+                'p.description AS productDescription'
+            )
+            ->leftJoin('product_categories AS pc', 'p.product_category_id', '=', 'pc.id')
+        ->get();
+        return response()->json($object);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        if($request->id) {
+            $model = Product::find($request->id);
+        } else {
+            $model = new Product();
+        }
+        $model->product_category_id = $request->product_category_id; 
+        $model->name = $request->name; 
+        $model->description = $request->description; 
+        if($model->save()) {
+            return response()->json([
+                'status' => true,
+                'data' => $model
+            ]);
+        }
+        
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreProductRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreProductRequest $request)
-    {
-        //
+    public function variantsByProduct(Request $request) {
+        $object = DB::table('product_variants AS pv')
+            ->select(
+                'pv.id', 
+                'pv.name'
+            )
+            ->where('pv.product_id', $request->id)
+            ->get();
+        return response()->json($object);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateProductRequest  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateProductRequest $request, Product $product)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Product $product)
-    {
-        //
-    }
 }

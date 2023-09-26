@@ -20,24 +20,14 @@ class AttributeController extends Controller
     {
         if($request->id) {
             $model = Attribute::find($request->id);
-            $model->name = $request->name;
-            $model->type = $request->type;
-            if($model->save()) {
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Updated successfully',
-                    'data' => $model
-                ]);
-            }   
+        } else {
+            $model = new Attribute();
         }
-        
-        $model = new Attribute();
         $model->name = $request->name;
         $model->type = $request->type;
         if($model->save()) {
             return response()->json([
                 'status' => 200,
-                'message' => 'Saved successfully',
                 'data' => $model
             ]);
         }

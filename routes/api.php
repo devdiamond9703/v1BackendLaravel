@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AttributeController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +25,14 @@ Route::get('attributes', [AttributeController::class, 'index']);
 Route::post('attributes', [AttributeController::class, 'store']);
 Route::get('attributes/value/{id}', [AttributeController::class, 'valuesByAttr']);
 Route::post('attributes/value', [AttributeController::class, 'storeValueByAttr']);
-// Route::get('attributes/show/{id}', [AttributeController::class, 'show']);
-// Route::put('attributes/edit/{id}', [AttributeController::class, 'update']);
-// Route::delete('attributes/delete/{id}', [AttributeController::class, 'delete']);
+
+Route::get('categories', [ProductCategoryController::class, 'index']);
+Route::post('categories', [ProductCategoryController::class, 'store']);
+Route::get('categories/attr/{id}', [ProductCategoryController::class, 'attrByCategory']);
+Route::post('categories/attr', [ProductCategoryController::class, 'storeAttrByCategory']);
+
+Route::get('products', [ProductController::class, 'index']);
+Route::post('products', [ProductController::class, 'store']);
+Route::get('products/variants/{id}', [ProductController::class, 'variantsByProduct']);
+
+Route::post('login', [AuthController::class, 'login']);
